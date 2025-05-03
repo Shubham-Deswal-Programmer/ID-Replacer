@@ -14,8 +14,8 @@ def replace_text_in_pdf(pdf_bytes, replacements):
             page.apply_redactions()
             for inst in text_instances:
                 # Apply 4-pixel vertical correction
-                new_position = fitz.Point(inst.tl.x, inst.tl.y + 8)
-                page.insert_text(new_position, new, fontsize=12, color=(0, 0, 0))
+                new_position = fitz.Point(inst.tl.x, inst.tl.y + 12)
+                page.insert_text(new_position, new, fontsize=9, fontname="Courier", color=(0, 0, 0))
     output = io.BytesIO()
     doc.save(output)
     doc.close()
