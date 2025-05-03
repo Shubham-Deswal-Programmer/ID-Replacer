@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import fitz  # PyMuPDF
 import io
+import os
 
 def replace_text_in_pdf(pdf_bytes, replacements):
     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
@@ -12,7 +13,9 @@ def replace_text_in_pdf(pdf_bytes, replacements):
                 page.add_redact_annot(inst, fill=(1, 1, 1))
             page.apply_redactions()
             for inst in text_instances:
-                page.insert_text(inst.tl, new, fontsize=12, color=(0, 0, 0))
+                # Apply 4-pixel vertical correction
+                new_position = fitz.Point(inst.tl.x, inst.tl.y + 4)
+                page.insert_text(new_position, new, fontsize=12, color=(0, 0, 0))
     output = io.BytesIO()
     doc.save(output)
     doc.close()
@@ -37,11 +40,15 @@ if pdf_file and csv_file:
 
         if st.button("Replace IDs with Names"):
             result_pdf = replace_text_in_pdf(pdf_file.read(), replacements)
+
+            original_filename = os.path.splitext(pdf_file.name)[0]
+            new_filename = f"{original_filename}_updated.pdf"
+
             st.success("PDF processed successfully!")
             st.download_button(
                 label="Download Updated PDF",
                 data=result_pdf,
-                file_name="updated_file.pdf",
+                file_name=new_filename,
                 mime="application/pdf"
             )
     except Exception as e:
