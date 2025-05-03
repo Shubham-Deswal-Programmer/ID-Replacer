@@ -1,4 +1,7 @@
-import streamlit as st import pandas as pd import fitz  # PyMuPDF import io
+import streamlit as st
+import pandas as pd
+import fitz  # PyMuPDF
+import io
 
 def replace_text_in_pdf(pdf_bytes, replacements): doc = fitz.open(stream=pdf_bytes, filetype="pdf") for page in doc: for old, new in replacements.items(): text_instances = page.search_for(old) for inst in text_instances: page.add_redact_annot(inst, fill=(1, 1, 1)) page.apply_redactions() for inst in text_instances: page.insert_text(inst.tl, new, fontsize=12, color=(0, 0, 0))
 
